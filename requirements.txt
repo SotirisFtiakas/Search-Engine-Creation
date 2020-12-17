@@ -1,2 +1,15 @@
+"use pip to install"
 Flask
 flask_mysqldb
+bs4
+trafilatura
+
+"use conda to install"
+scrapy
+trafilatura
+
+"already in env"
+threading
+time
+re
+numpy
