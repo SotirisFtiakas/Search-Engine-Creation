@@ -6,6 +6,21 @@ import trafilatura
 import threading
 import numpy as np
 
+from flask import Flask
+from flask_mysqldb import MySQL
+import yaml
+
+crawler = Flask(__name__)
+
+# Configure db
+db = yaml.safe_load(open('db.yaml'))
+crawler.config['MYSQL_HOST'] = db['mysql_host']
+crawler.config['MYSQL_USER'] = db['mysql_user']
+crawler.config['MYSQL_PASSWORD'] = db['mysql_password']
+crawler.config['MYSQL_DB'] = db['mysql_db']
+
+mysql = MySQL(crawler)
+
 def getLinks(url, temp):
     try:
         r = requests.get(url, timeout=2)
@@ -38,11 +53,20 @@ def write_to_file(temp):
         for link in temp:
             f.write("%s\n" % link)
 
+def write_to_database(temp):
+    for url in temp:
+        with crawler.app_context():
+            cur = mysql.connection.cursor()
+            #content = trafilatura.fetch_url(url)
+            cur.execute("INSERT INTO urls(url) VALUES(%s)", (url,))
+            mysql.connection.commit()
+            cur.close()
+
 if __name__ == "__main__":
     temp = []
     number_of_threads = 5
     base_url = "https://www.nytimes.com/"
-    number_of_urls = 200
+    number_of_urls = 100
 
     getLinks(base_url, temp)
     print(len(temp))
@@ -55,3 +79,4 @@ if __name__ == "__main__":
                 break
 
     write_to_file(temp)
+    write_to_database(temp)
