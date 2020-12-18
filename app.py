@@ -1,7 +1,7 @@
 # Create anaconda env and
 # pip install -r requirements.txt
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_mysqldb import MySQL
 import yaml
 
@@ -20,24 +20,23 @@ mysql = MySQL(app)
 def index():
     if request.method == 'POST':
         # Fetch form data
-        userDetails = request.form
-        name = userDetails['name']
-        email = userDetails['email']
+        qDetails = request.form
+        query = qDetails['query']
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO users(name, email) VALUES(%s, %s)", (name, email))
+        cur.execute("INSERT INTO searches(query) VALUES(%s)", (query, ))
         mysql.connection.commit()
         cur.close()
-        return 'Success'
-        #return redirect('/users')
+        #return 'Success'
+        return redirect('/queries')
     return render_template('index.html')
 
-@app.route('/users')
-def users():
+@app.route('/queries')
+def queries():
     cur = mysql.connection.cursor()
-    resultValue = cur.execute("SELECT * FROM users")
+    resultValue = cur.execute("SELECT * FROM searches")
     if resultValue > 0:
-        userDetails = cur.fetchall()
-        return render_template('users.html', userDetails=userDetails)
+        qDetails = cur.fetchall()
+        return render_template('queries.html', qDetails=qDetails)
     else :
         return "Empty Database"
 
