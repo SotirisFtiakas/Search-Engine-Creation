@@ -5,23 +5,16 @@ import time
 import trafilatura
 import threading
 import numpy as np
+import pandas as pd
+import time
+import warnings #needed for this type of classifier
+warnings.simplefilter(action='ignore', category=Warning)
 
 from flask import Flask
-from flask_mysqldb import MySQL
-import yaml
 
 crawler = Flask(__name__)
 
-# Configure db
-db = yaml.safe_load(open('db.yaml'))
-crawler.config['MYSQL_HOST'] = db['mysql_host']
-crawler.config['MYSQL_USER'] = db['mysql_user']
-crawler.config['MYSQL_PASSWORD'] = db['mysql_password']
-crawler.config['MYSQL_DB'] = db['mysql_db']
-
-mysql = MySQL(crawler)
-
-def getLinks(url, temp):
+def getLinks(url, temp, my_dict):
     try:
         r = requests.get(url, timeout=2)
         if (r.status_code == 200):
@@ -46,21 +39,13 @@ def multi_threading_scrapping(url_list):
         downloaded = trafilatura.fetch_url(link.get('href'))
         if trafilatura.extract(downloaded) != None:
             temp.append(link.get('href'))
+            my_dict[link.get('href')] = trafilatura.extract(downloaded)
 
 
-def write_to_file(temp):
-    with open('urls.txt', 'w', encoding="utf-8") as f:
-        for link in temp:
-            f.write("%s\n" % link)
 
-def write_to_database(temp):
-    for url in temp:
-        with crawler.app_context():
-            cur = mysql.connection.cursor()
-            #content = trafilatura.fetch_url(url)
-            cur.execute("INSERT INTO urls(url) VALUES(%s)", (url,))
-            mysql.connection.commit()
-            cur.close()
+def write_to_file(my_dict):
+    df = pd.DataFrame(my_dict.items())
+    df.to_csv(r'database.csv')      
 
 if __name__ == "__main__":
     temp = []
@@ -68,15 +53,20 @@ if __name__ == "__main__":
     base_url = "https://www.nytimes.com/"
     number_of_urls = 100
 
-    getLinks(base_url, temp)
-    print(len(temp))
+    my_dict = {}
 
-    if len(temp) < number_of_urls:
+    start = time.time()
+    print(len(my_dict))
+    getLinks(base_url, temp, my_dict)
+    print(len(my_dict))
+
+    if len(my_dict) < number_of_urls:
         for link in temp:
-            getLinks(link, temp)
-            print(len(temp))
-            if len(temp) > number_of_urls:
+            getLinks(link, temp, my_dict)
+            print(len(my_dict))
+            if len(my_dict) > number_of_urls:
                 break
 
-    write_to_file(temp)
-    write_to_database(temp)
+    end = time.time()
+    print("Total time of crawling: ", end - start, "seconds")
+    write_to_file(my_dict)
