@@ -36,16 +36,26 @@ def getLinks(url, temp, my_dict):
 
 def multi_threading_scrapping(url_list):
     for link in url_list:
-        downloaded = trafilatura.fetch_url(link.get('href'))
+        url = link.get('href')
+        downloaded = trafilatura.fetch_url(url)
         if trafilatura.extract(downloaded) != None:
-            temp.append(link.get('href'))
-            my_dict[link.get('href')] = trafilatura.extract(downloaded)
+            # Make a GET request to fetch the raw HTML content
+            html_content = requests.get(url).text
+            # Parse the html content
+            soup = BeautifulSoup(html_content, "lxml")
 
+            temp.append(url)
+            #print("hello there: ", soup.title.text)
+            my_dict['Url'].append(url)
+            my_dict['Title'].append(soup.title.text)
+            my_dict['Content'].append(trafilatura.extract(downloaded))
+            my_dict['Score'].append(0)
 
 
 def write_to_file(my_dict):
-    df = pd.DataFrame(my_dict.items())
-    df.to_csv(r'database.csv')      
+    df = pd.DataFrame.from_dict(my_dict, orient='index')
+    transpose_df = df.T
+    transpose_df.to_csv(r'database.csv')      
 
 if __name__ == "__main__":
     temp = []
@@ -53,18 +63,18 @@ if __name__ == "__main__":
     base_url = "https://www.nytimes.com/"
     number_of_urls = 100
 
-    my_dict = {}
+    my_dict = {'Url':[], 'Title':[], 'Content':[], 'Score':[]}
 
     start = time.time()
-    print(len(my_dict))
+    print(len(temp))
     getLinks(base_url, temp, my_dict)
-    print(len(my_dict))
+    print(len(temp))
 
-    if len(my_dict) < number_of_urls:
+    if len(temp) < number_of_urls:
         for link in temp:
             getLinks(link, temp, my_dict)
-            print(len(my_dict))
-            if len(my_dict) > number_of_urls:
+            print(len(temp))
+            if len(temp) > number_of_urls:
                 break
 
     end = time.time()
