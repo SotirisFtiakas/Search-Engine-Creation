@@ -1,5 +1,4 @@
 # Importing needed libraries
-from flask import Flask
 
 from bs4 import BeautifulSoup
 import trafilatura
@@ -12,7 +11,7 @@ import numpy as np
 import pandas as pd
 import time
 
-crawler = Flask(__name__)
+import sys
 
 def getLinks(url, temp, my_dict):
     """
@@ -94,13 +93,13 @@ def write_to_file(my_dict):
     """
     df = pd.DataFrame.from_dict(my_dict, orient='index')
     transpose_df = df.T
-    transpose_df.to_csv(r'database.csv')      
+    transpose_df.to_csv(r'database.csv',index=False)      
 
 if __name__ == "__main__":
     temp = []
-    number_of_threads = 5 # The preferable number of threads.
-    base_url = "https://www.nytimes.com/" # The base url-link, from which the program will start crawling and scrapping.
-    number_of_urls = 100 # The preferable number of different urls-links.
+    number_of_threads = int(sys.argv[3]) # The preferable number of threads.
+    base_url = str(sys.argv[1]) # The base url-link, from which the program will start crawling and scrapping.
+    number_of_urls = int(sys.argv[2]) # The preferable number of different urls-links.
 
     # Dictionary with lists for urls, titles, content and score.
     my_dict = {'Url':[], 'Title':[], 'Content':[], 'Score':[]}
@@ -121,3 +120,4 @@ if __name__ == "__main__":
     end = time.time()
     print("Total time of crawling: ", end - start, "seconds")
     write_to_file(my_dict)
+    
