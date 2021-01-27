@@ -63,6 +63,7 @@ def TF_Process(data):
         
     return globalDict, documentsTF
 
+
 # Function to calculate IDF for every term
 def IDF_Process(globalDict,total_docs):
     dictionaryIDF = globalDict.copy()
@@ -74,7 +75,7 @@ def IDF_Process(globalDict,total_docs):
 if __name__ == "__main__":
 
     data = pd.read_csv("database.csv")
-    preprocessing(data)
+    preprocessing(data["Content"])
     globalDict, documentsTF = TF_Process(data)
     dictionaryIDF = IDF_Process(globalDict,data.shape[0]) 
 
