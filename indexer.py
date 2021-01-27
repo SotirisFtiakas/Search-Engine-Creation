@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import string
-
+import math
 
 # Function for data preprocessing
 def preprocessing(data):
@@ -24,7 +24,7 @@ def termFrequency(term,all_words,sum_of_words):
     return all_words.count(term) / float(sum_of_words)
 
 
-
+# Function to calculate TF for every term in every document
 def TF_Process(data):
     globalDict = {}     # Global dictionary where:
                             # key = term
@@ -63,12 +63,20 @@ def TF_Process(data):
         
     return globalDict, documentsTF
 
+# Function to calculate IDF for every term
+def IDF_Process(globalDict,total_docs):
+    dictionaryIDF = globalDict.copy()
+    for i in dictionaryIDF.keys():
+        dictionaryIDF[i] = 1 + math.log(float(total_docs/len(dictionaryIDF[i])))
+    return dictionaryIDF
+
 
 if __name__ == "__main__":
 
     data = pd.read_csv("database.csv")
     preprocessing(data)
     globalDict, documentsTF = TF_Process(data)
-    print(globalDict)
+    dictionaryIDF = IDF_Process(globalDict,data.shape[0]) 
+
 
 
