@@ -79,13 +79,18 @@ if __name__ == "__main__":
     preprocessing(data)
     globalDict, documentsTF = TF_Process(data)
     dictionaryIDF = IDF_Process(globalDict,data.shape[0]) 
-    query = "Los unlimited favorito?"
+    query = "Why is bitcoin going up so fast?"
     query = query_Preprocessing(query)
     queryGlobalDict, queryTF = query_TF_Process(query,data,globalDict)
     queryDictionaryIDF = query_IDF_Process(query, queryGlobalDict, data.shape[0])
     queryTFIDF={}
     for i in query:
         queryTFIDF[i] = queryDictionaryIDF[i]*queryTF[i]
+
+    # if any of the queries terms doesn't exist in our database, then give them a value of zero
+    for i in query:
+        if not i in dictionaryIDF.keys():
+            dictionaryIDF[i]=0
     # fill documentsTF's documents' missing key:value pairs with key=key:value=0
     for i in dictionaryIDF.keys():
         for j in range(len(documentsTF)):
@@ -96,6 +101,6 @@ if __name__ == "__main__":
     query_data = data.copy()
     query_data['Score'] = np.array(similarity_matrix)
     query_data.sort_values(by=['Score'], inplace=True, ascending=False)
-    print(query_data.head())
+    print(query_data[["Content","Score"]].head())
 
     
