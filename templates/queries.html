@@ -1,8 +1,54 @@
-<table border = 1>
-    {% for title, url in queryDetails %}
-    <tr>
-        <td> {{title}} </td>
-        <td> <a href={{url}}>Link</a> </td>
-    </tr>
-    {% endfor %}
-</table>
+<form method="POST", action="{{ url_for('queries') }}">
+    <div class="row">
+        <div class="column">
+            <table border = 1>
+                {% for title, url in queryDetails %}
+                <tr>
+                    <td> {{title}} </td>
+                    <td> <a href={{url}}>Link 🌐</a> </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="column">
+            <table border = 1>
+                <tr>
+                    <td> <input type="checkbox" id="like1" name="better" value="0">
+                        <label for="like1"> Like 👍</label><br> </td>
+                </tr>
+                <tr>
+                    <td> <input type="checkbox" id="like2" name="better" value="1">
+                        <label for="like2"> Like 👍</label><br> </td>
+                </tr>
+                <tr>
+                    <td> <input type="checkbox" id="like3" name="better" value="2">
+                        <label for="like3"> Like 👍</label><br> </td>
+                </tr>
+                <tr>
+                    <td> <input type="checkbox" id="like4" name="better" value="3">
+                        <label for="like4"> Like 👍</label><br> </td>
+                </tr>
+                <tr>
+                    <td> <input type="checkbox" id="like5" name="better" value="4">
+                        <label for="like5"> Like 👍</label><br> </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <button class="acceptbutton" type="submit"> <span>Show me better results!</span> </button>
+    
+</form>
+
+<style>
+
+    .row {
+      display: flex;
+      margin-left:0 px;
+      margin-right:100px;
+    }
+    .column {
+      flex: 50%;
+      padding: 5px;
+    }
+</style>
