@@ -27,8 +27,9 @@ def index():
 def queries():
     queries_df = results.head()#pd.read_csv("foo.csv")
     if queries_df.size > 2:
-        qDetails = queries_df['Content'].tolist()
-        return render_template('queries.html', qDetails=qDetails)
+        qDetailsTitle = queries_df["Title"].tolist()
+        qDetailsUrl = queries_df["Url"].tolist()
+        return render_template('queries.html', queryDetails=zip(qDetailsTitle,qDetailsUrl))
     else :
         return "Empty Database"
 

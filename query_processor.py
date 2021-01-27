@@ -99,8 +99,8 @@ def query_search(query):
     query_data = data.copy()
     query_data['Score'] = np.array(similarity_matrix)
     query_data.sort_values(by=['Score'], inplace=True, ascending=False)
-    print(query_data[["Content","Score"]].head())
-    return query_data[["Content","Score"]]
+    #print(query_data[["Content","Score"]].head())
+    return query_data
 
 if __name__ == "__main__":
 
