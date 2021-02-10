@@ -18,6 +18,8 @@ def preprocessing(data):
     for i, row in data.iterrows():
         data.at[i,'Content'] = ' '.join([word for word in data.at[i,'Content'].split() if word not in stopwords])
     
+    return data
+    
 
 # Function to calculate the normalized TF of a word in a document
 def termFrequency(term,all_words,sum_of_words):

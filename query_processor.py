@@ -72,12 +72,62 @@ def cosine_similarity(query, queryTFIDF, documentsTF, dictionaryIDF):
     
     return similarity_matrix
 
+def create_vector(single_doc, dictionaryIDF, queryGlobalDict):
+    doc_tfidf = {}
+    for term in queryGlobalDict.keys():
+        doc_tfidf[term] = 0
+    
+    for term in queryGlobalDict.keys():
+        if term in single_doc.keys():
+            doc_tfidf[term] = single_doc[term]* dictionaryIDF[term]
+
+    return doc_tfidf
+
+def create_optimized_query(better, queries_df, full_query_vector):
+    worse = [0,1,2,3,4,5,6]
+    a = 1       # Initial TFIDF
+    b = 0.5     # + 0.5 of good pages TFIDFs
+    c = 0.25    # - 0.25 of bad pages TFIDFs
+
+    print("------------------------------------------------------------")
+    #print(list(queries_df['TFIDF'][0].values()))
+    good = []
+    for i in better:
+        worse.remove(int(i))
+        #print(list(queries_df['TFIDF'][0].values()))
+        good.append(list(queries_df['TFIDF'][int(i)].values()))
+
+    bad = []
+    for i in worse:
+        bad.append(list(queries_df['TFIDF'][int(i)].values()))
+    
+    best_query = np.dot(a,list(full_query_vector.values()))
+    with open('original_query.txt', 'w') as f:
+        for item in best_query:
+            f.write("%s\n" % item)
+
+    for i in good:
+        best_query = np.add(best_query,np.dot(b,i))
+    for i in bad:
+        best_query = np.subtract(best_query, np.dot(c, i))
+
+    with open('optimized_query.txt', 'w') as f:
+        for item in best_query:
+            f.write("%s\n" % item)
+
+    return best_query
+
+def optimized_query(better, queries_df, full_query_vector, results):
+    best_query = create_optimized_query(better, queries_df, full_query_vector)
+    #return res2
+
 def query_search(query):
     data = pd.read_csv("database.csv")
-    preprocessing(data)
+    data = preprocessing(data)
     globalDict, documentsTF = TF_Process(data)
+    #print(documentsTF[0])
     dictionaryIDF = IDF_Process(globalDict,data.shape[0]) 
-    #query = "Coronavirus"
+    #print(dictionaryIDF[0])
     query = query_Preprocessing(query)
     queryGlobalDict, queryTF = query_TF_Process(query,data,globalDict)
     queryDictionaryIDF = query_IDF_Process(query, queryGlobalDict, data.shape[0])
@@ -95,12 +145,26 @@ def query_search(query):
             if not i in documentsTF[j]:
                 documentsTF[j][i]=0
 
+    print(queryTFIDF)
+    tfidf_list = []
+    for single_doc in documentsTF:
+        tfidf_list.append(create_vector(single_doc, dictionaryIDF, queryGlobalDict))
+    
+    full_query_vector={}
+    for term in queryGlobalDict.keys():
+        full_query_vector[term] = 0
+    
+    for term in query:
+        full_query_vector[term] = queryTFIDF[term]
+
     similarity_matrix = cosine_similarity(query, queryTFIDF, documentsTF, dictionaryIDF)
     query_data = data.copy()
+    query_data['TFIDF'] = tfidf_list
     query_data['Score'] = np.array(similarity_matrix)
     query_data.sort_values(by=['Score'], inplace=True, ascending=False)
     #print(query_data[["Content","Score"]].head())
-    return query_data
+    #print(query_data)
+    return query_data, full_query_vector
 
 if __name__ == "__main__":
 

@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    global results
+    global results, full_query_vector
     queries_df = pd.read_csv("foo.csv")
     if request.method == 'POST':
         # Fetch form data
@@ -18,30 +18,26 @@ def index():
         if (query != ''):
             single_query = {'Query': query}
             queries_df = queries_df.append(single_query, ignore_index=True)
-            queries_df.to_csv(r'foo.csv')
-            results = qp.query_search(query)
+            #queries_df.to_csv(r'foo.csv')
+            results, full_query_vector = qp.query_search(query)
         return redirect('/queries')
     return render_template('index.html')
 
-# @app.route('/queries')
-# def queries():
-#    queries_df = results.head()#pd.read_csv("foo.csv")
-#    if queries_df.size > 2:
-#        qDetailsTitle = queries_df["Title"].tolist()
-#        qDetailsUrl = queries_df["Url"].tolist()
-#        return render_template('queries.html', queryDetails=zip(qDetailsTitle,qDetailsUrl))
-#    else :
-#        return "Empty Database"
-
 @app.route('/queries', methods=['GET', 'POST'])
 def queries():
-    queries_df = results.head()
+    queries_df = results.head(7)
     qDetailsTitle = queries_df["Title"].tolist()
     qDetailsUrl = queries_df["Url"].tolist()
+    #print(queries_df)
     if request.method == 'POST':
         better = request.form.getlist('better')
-        for i in better:
-            print(qDetailsTitle[int(i)])
+        qp.optimized_query(better, queries_df.reset_index(drop=True), full_query_vector, results)
+        # newResults = qp.optimized_query(better, queries_df, full_query_vector)
+        # queries_df = newResults.head(7)
+        # qDetailsTitle = queries_df["Title"].tolist()
+        # qDetailsUrl = queries_df["Url"].tolist()
+        #for i in better:
+        #    print(qDetailsTitle[int(i)])
     return render_template('queries.html', queryDetails=zip(qDetailsTitle,qDetailsUrl))
 
 
