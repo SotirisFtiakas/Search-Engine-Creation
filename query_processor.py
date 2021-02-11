@@ -137,7 +137,12 @@ def optimized_query(better, queries_df, full_query_vector, results):
     results.sort_values(by=['Score'], inplace=True, ascending=False)
     #print(query_data[["Content","Score"]].head())
     #print(query_data)
-    return results ##
+    counter=0
+    for i in full_query_vector.keys():
+        full_query_vector[i] = best_query[counter]
+        counter = counter + 1
+    print(full_query_vector)
+    return results, full_query_vector ##
 
     #return res2
 

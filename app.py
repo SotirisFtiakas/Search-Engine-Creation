@@ -25,19 +25,22 @@ def index():
 
 @app.route('/queries', methods=['GET', 'POST'])
 def queries():
+    global full_query_vector
     queries_df = results.head(7)
     qDetailsTitle = queries_df["Title"].tolist()
     qDetailsUrl = queries_df["Url"].tolist()
+    qDetailsScore = queries_df["Score"].tolist()
     #print(queries_df)
     if request.method == 'POST':
         better = request.form.getlist('better')
-        newResults = qp.optimized_query(better, queries_df.reset_index(drop=True), full_query_vector, results)
+        newResults, full_query_vector = qp.optimized_query(better, queries_df.reset_index(drop=True), full_query_vector, results)
         queries_df = newResults.head(7)
         qDetailsTitle = queries_df["Title"].tolist()
         qDetailsUrl = queries_df["Url"].tolist()
+        qDetailsScore = queries_df["Score"].tolist()
         #for i in better:
         #    print(qDetailsTitle[int(i)])
-    return render_template('queries.html', queryDetails=zip(qDetailsTitle,qDetailsUrl))
+    return render_template('queries.html', queryDetails=zip(qDetailsTitle,qDetailsUrl,qDetailsScore))
 
 
 @app.errorhandler(404)

@@ -2,10 +2,11 @@
     <div class="row">
         <div class="column">
             <table border = 1>
-                {% for title, url in queryDetails %}
+                {% for title, url, score in queryDetails %}
                 <tr>
                     <td> {{title}} </td>
                     <td> <a href={{url}}>Link 🌐</a> </td>
+                    <td> {{score}} </td>
                 </tr>
                 {% endfor %}
             </table>
