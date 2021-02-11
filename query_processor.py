@@ -45,10 +45,10 @@ def query_TF_Process(query, data, globalDict):
 
 
 # Function to calculate IDF for every term
-def query_IDF_Process(query, queryGlobalDict, total_docs):
-    queryDictionaryIDF = queryGlobalDict.copy()
+def query_IDF_Process(query, queryGlobalDict, dictionaryIDF, total_docs):
+    queryDictionaryIDF = dictionaryIDF.copy()
     for i in query:
-        queryDictionaryIDF[i] = 1 + math.log(float(total_docs/len(queryDictionaryIDF[i])))
+        queryDictionaryIDF[i] = 1 + math.log(float(total_docs/len(queryGlobalDict[i])))
     return queryDictionaryIDF
 
 
@@ -72,14 +72,14 @@ def cosine_similarity(query, queryTFIDF, documentsTF, dictionaryIDF):
     
     return similarity_matrix
 
-def create_vector(single_doc, dictionaryIDF, queryGlobalDict):
+def create_vector(single_doc, queryDictionaryIDF, queryGlobalDict):
     doc_tfidf = {}
     for term in queryGlobalDict.keys():
         doc_tfidf[term] = 0
     
     for term in queryGlobalDict.keys():
         if term in single_doc.keys():
-            doc_tfidf[term] = single_doc[term]* dictionaryIDF[term]
+            doc_tfidf[term] = single_doc[term]* queryDictionaryIDF[term]
 
     return doc_tfidf
 
@@ -130,7 +130,8 @@ def query_search(query):
     #print(dictionaryIDF[0])
     query = query_Preprocessing(query)
     queryGlobalDict, queryTF = query_TF_Process(query,data,globalDict)
-    queryDictionaryIDF = query_IDF_Process(query, queryGlobalDict, data.shape[0])
+    queryDictionaryIDF = query_IDF_Process(query, queryGlobalDict, dictionaryIDF, data.shape[0])
+
     queryTFIDF={}
     for i in query:
         queryTFIDF[i] = queryDictionaryIDF[i]*queryTF[i]
@@ -145,10 +146,9 @@ def query_search(query):
             if not i in documentsTF[j]:
                 documentsTF[j][i]=0
 
-    print(queryTFIDF)
     tfidf_list = []
     for single_doc in documentsTF:
-        tfidf_list.append(create_vector(single_doc, dictionaryIDF, queryGlobalDict))
+        tfidf_list.append(create_vector(single_doc, queryDictionaryIDF, queryGlobalDict))
     
     full_query_vector={}
     for term in queryGlobalDict.keys():
@@ -166,34 +166,34 @@ def query_search(query):
     #print(query_data)
     return query_data, full_query_vector
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    data = pd.read_csv("database.csv")
-    preprocessing(data)
-    globalDict, documentsTF = TF_Process(data)
-    dictionaryIDF = IDF_Process(globalDict,data.shape[0]) 
-    query = "Coronavirus"
-    query = query_Preprocessing(query)
-    queryGlobalDict, queryTF = query_TF_Process(query,data,globalDict)
-    queryDictionaryIDF = query_IDF_Process(query, queryGlobalDict, data.shape[0])
-    queryTFIDF={}
-    for i in query:
-        queryTFIDF[i] = queryDictionaryIDF[i]*queryTF[i]
+#     data = pd.read_csv("database.csv")
+#     preprocessing(data)
+#     globalDict, documentsTF = TF_Process(data)
+#     dictionaryIDF = IDF_Process(globalDict,data.shape[0]) 
+#     query = "Coronavirus"
+#     query = query_Preprocessing(query)
+#     queryGlobalDict, queryTF = query_TF_Process(query,data,globalDict)
+#     queryDictionaryIDF = query_IDF_Process(query, queryGlobalDict, data.shape[0])
+#     queryTFIDF={}
+#     for i in query:
+#         queryTFIDF[i] = queryDictionaryIDF[i]*queryTF[i]
 
-    # if any of the queries terms doesn't exist in our database, then give them a value of zero
-    for i in query:
-        if not i in dictionaryIDF.keys():
-            dictionaryIDF[i]=0
-    # fill documentsTF's documents' missing key:value pairs with key=key:value=0
-    for i in dictionaryIDF.keys():
-        for j in range(len(documentsTF)):
-            if not i in documentsTF[j]:
-                documentsTF[j][i]=0
+#     # if any of the queries terms doesn't exist in our database, then give them a value of zero
+#     for i in query:
+#         if not i in dictionaryIDF.keys():
+#             dictionaryIDF[i]=0
+#     # fill documentsTF's documents' missing key:value pairs with key=key:value=0
+#     for i in dictionaryIDF.keys():
+#         for j in range(len(documentsTF)):
+#             if not i in documentsTF[j]:
+#                 documentsTF[j][i]=0
 
-    similarity_matrix = cosine_similarity(query, queryTFIDF, documentsTF, dictionaryIDF)
-    query_data = data.copy()
-    query_data['Score'] = np.array(similarity_matrix)
-    query_data.sort_values(by=['Score'], inplace=True, ascending=False)
-    print(query_data[["Content","Score"]].head())
+#     similarity_matrix = cosine_similarity(query, queryTFIDF, documentsTF, dictionaryIDF)
+#     query_data = data.copy()
+#     query_data['Score'] = np.array(similarity_matrix)
+#     query_data.sort_values(by=['Score'], inplace=True, ascending=False)
+#     print(query_data[["Content","Score"]].head())
 
     
