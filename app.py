@@ -31,11 +31,10 @@ def queries():
     #print(queries_df)
     if request.method == 'POST':
         better = request.form.getlist('better')
-        qp.optimized_query(better, queries_df.reset_index(drop=True), full_query_vector, results)
-        # newResults = qp.optimized_query(better, queries_df, full_query_vector)
-        # queries_df = newResults.head(7)
-        # qDetailsTitle = queries_df["Title"].tolist()
-        # qDetailsUrl = queries_df["Url"].tolist()
+        newResults = qp.optimized_query(better, queries_df.reset_index(drop=True), full_query_vector, results)
+        queries_df = newResults.head(7)
+        qDetailsTitle = queries_df["Title"].tolist()
+        qDetailsUrl = queries_df["Url"].tolist()
         #for i in better:
         #    print(qDetailsTitle[int(i)])
     return render_template('queries.html', queryDetails=zip(qDetailsTitle,qDetailsUrl))

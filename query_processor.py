@@ -67,10 +67,8 @@ def query_IDF_Process(query, queryGlobalDict, dictionaryIDF, total_docs):
 #     return (dot_product/query_norm*doc_norm)
 
 
-def cosine_similarity1(full_query_vector,tfidf_list):
-    query_vector_list = list(full_query_vector.values())
+def cosine_similarity1(query_vector_list,tfidf_list):
     similarity_matrix = [cosine_formula1(query_vector_list,list(doc.values())) for doc in tfidf_list]
-    print(similarity_matrix)
     return similarity_matrix
 
 def cosine_formula1(query,doc):
@@ -132,6 +130,15 @@ def create_optimized_query(better, queries_df, full_query_vector):
 
 def optimized_query(better, queries_df, full_query_vector, results):
     best_query = create_optimized_query(better, queries_df, full_query_vector)
+    tfidf_list = results["TFIDF"].tolist()
+    similarity_matrix = cosine_similarity1(best_query,tfidf_list)
+
+    results['Score'] = np.array(similarity_matrix)
+    results.sort_values(by=['Score'], inplace=True, ascending=False)
+    #print(query_data[["Content","Score"]].head())
+    #print(query_data)
+    return results ##
+
     #return res2
 
 def query_search(query):
@@ -172,7 +179,8 @@ def query_search(query):
 
     
     #similarity_matrix = cosine_similarity(query, queryTFIDF, documentsTF, dictionaryIDF)
-    similarity_matrix = cosine_similarity1(full_query_vector,tfidf_list)
+    query_vector_list = list(full_query_vector.values())
+    similarity_matrix = cosine_similarity1(query_vector_list,tfidf_list)
     query_data = data.copy()
     query_data['TFIDF'] = tfidf_list
     query_data['Score'] = np.array(similarity_matrix)
