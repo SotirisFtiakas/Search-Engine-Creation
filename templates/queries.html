@@ -1,63 +1,96 @@
+<div class="container">
 <form method="POST", action="{{ url_for('queries') }}">
-    <div class="row">
-        <div class="column">
-            <table border = 1>
-                {% for title, url, score in queryDetails %}
+
+            <table border=1>
+                <tr>
+                    <th> T I T L E </th>
+                    <th> S I T E </th>
+                    <th> S C O R E </th>
+                    <th>F E E D B A C K</th>
+                </tr>    
+                {% for title, url, score, i in queryDetails %}
                 <tr>
                     <td> {{title}} </td>
                     <td> <a href={{url}}>Link 🌐</a> </td>
                     <td> {{score}} </td>
+                    <td> <input type="checkbox" id="like" name="better" value={{i}}>
+                        <label for="like"> Like 👍</label><br> </td>
                 </tr>
                 {% endfor %}
             </table>
-        </div>
-        <div class="column">
-            <table border = 1>
-                <tr>
-                    <td> <input type="checkbox" id="like1" name="better" value="0">
-                        <label for="like1"> Like 👍</label><br> </td>
-                </tr>
-                <tr>
-                    <td> <input type="checkbox" id="like2" name="better" value="1">
-                        <label for="like2"> Like 👍</label><br> </td>
-                </tr>
-                <tr>
-                    <td> <input type="checkbox" id="like3" name="better" value="2">
-                        <label for="like3"> Like 👍</label><br> </td>
-                </tr>
-                <tr>
-                    <td> <input type="checkbox" id="like4" name="better" value="3">
-                        <label for="like4"> Like 👍</label><br> </td>
-                </tr>
-                <tr>
-                    <td> <input type="checkbox" id="like5" name="better" value="4">
-                        <label for="like5"> Like 👍</label><br> </td>
-                </tr>
-                <tr>
-                    <td> <input type="checkbox" id="like5" name="better" value="5">
-                        <label for="like5"> Like 👍</label><br> </td>
-                </tr>
-                <tr>
-                    <td> <input type="checkbox" id="like5" name="better" value="6">
-                        <label for="like5"> Like 👍</label><br> </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    
+    <div class=centered>
     <button class="acceptbutton" type="submit"> <span>Show me better results!</span> </button>
-    
+</div>
 </form>
+</div>
 
 <style>
+body {
+	height: 100%;
+}
 
-    .row {
-      display: flex;
-      margin-left:0 px;
-      margin-right:100px;
-    }
-    .column {
-      flex: 50%;
-      padding: 5px;
-    }
+body {
+	margin: 0;
+	background: linear-gradient(45deg, #292929,#000000 );
+	font-family: sans-serif;
+	font-weight: 100;
+}
+
+.container {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+table {
+	width: 80vw;
+    height: 75vh;
+	border-collapse: collapse;
+	overflow: hidden;
+	box-shadow: 0 0 15px rgba(150, 150, 150, 0.3);
+}
+
+th {
+    font-size: 20;
+    text-shadow: 1px 1px #0000007e;
+    vertical-align: middle;
+    text-align: center;
+	padding: 15px;
+	background-color: rgba(255, 255, 255, 0.25);
+	color: rgb(219, 219, 219);
+    min-width: 150px;
+    height: 50px;
+}
+
+td {
+    vertical-align: middle;
+    text-align: center;
+	padding: 15px;
+	background-color: rgba(255,255,255,0.15);
+	color: white;
+    min-width: 150px;
+}
+
+.centered {
+    text-align: center;
+
+}
+
+a { color: rgb(174, 229, 255); 
+    text-decoration: none;}
+
+button {
+    margin-top: 15px;
+    padding: 8px;
+    color: #000000;
+    font-size: 17;
+    text-shadow: 1px 1px rgba(255, 255, 255, .3);
+    background: #c5c5c5;
+    box-shadow: 0 0 5px rgba(150, 150, 150, 0.3);
+}
+
+button:hover{
+opacity:.8;
+}
 </style>

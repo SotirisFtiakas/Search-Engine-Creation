@@ -31,6 +31,7 @@ def queries():
     qDetailsUrl = queries_df["Url"].tolist()
     qDetailsScore = queries_df["Score"].tolist()
     #print(queries_df)
+    rankings=["0","1","2","3","4","5","6"]
     if request.method == 'POST':
         better = request.form.getlist('better')
         newResults, full_query_vector = qp.optimized_query(better, queries_df.reset_index(drop=True), full_query_vector, results)
@@ -40,7 +41,7 @@ def queries():
         qDetailsScore = queries_df["Score"].tolist()
         #for i in better:
         #    print(qDetailsTitle[int(i)])
-    return render_template('queries.html', queryDetails=zip(qDetailsTitle,qDetailsUrl,qDetailsScore))
+    return render_template('queries.html', queryDetails=zip(qDetailsTitle,qDetailsUrl,qDetailsScore,rankings))
 
 
 @app.errorhandler(404)

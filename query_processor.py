@@ -100,7 +100,6 @@ def create_optimized_query(better, queries_df, full_query_vector):
     b = 0.5     # + 0.5 of good pages TFIDFs
     c = 0.25    # - 0.25 of bad pages TFIDFs
 
-    print("------------------------------------------------------------")
     #print(list(queries_df['TFIDF'][0].values()))
     good = []
     for i in better:
@@ -141,7 +140,6 @@ def optimized_query(better, queries_df, full_query_vector, results):
     for i in full_query_vector.keys():
         full_query_vector[i] = best_query[counter]
         counter = counter + 1
-    print(full_query_vector)
     return results, full_query_vector ##
 
     #return res2
