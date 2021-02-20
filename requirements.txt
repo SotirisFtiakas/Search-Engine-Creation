@@ -1,6 +1,5 @@
 "use pip to install"
 Flask
-flask_mysqldb
 bs4
 trafilatura
 
