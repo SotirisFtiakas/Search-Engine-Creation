@@ -114,19 +114,17 @@ if __name__ == "__main__":
     my_dict = {'Url':[], 'Title':[], 'Content':[], 'Score':[]}
 
     start = time.time()
-    print(len(temp))
     getLinks(base_url, temp, my_dict)
-    print(len(temp))
 
     # Checking the number of urls we have collected.
     if len(temp) < number_of_urls:
         for link in temp:
             getLinks(link, temp, my_dict)
-            print(len(temp))
             if len(temp) > number_of_urls:
+                print("Crawling Done!")
                 break
 
     end = time.time()
-    print("Total time of crawling: ", end - start, "seconds")
+    print("Total time of crawling: ", int(end - start), "seconds")
     write_to_file(my_dict, rewrite, number_of_urls)
     
