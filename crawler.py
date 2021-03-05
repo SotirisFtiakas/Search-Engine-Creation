@@ -16,7 +16,7 @@ import sys
 def getLinks(url, temp, my_dict):
     """
     Get the html content of the base url (page) and finds all available links.
-    Then creates threads in order to make the payload shorter
+    Then creates threads in order to make the payload shorter.
 
     Parameters:
     url (String): The base url.
@@ -80,12 +80,14 @@ def multi_threading_scrapping(url_list):
             my_dict['Score'].append(0) # all scores are initialized at 0.
 
 
-def write_to_file(my_dict):
+def write_to_file(my_dict, rewrite, number_of_urls):
     """
     Create the CSV file of the database from a dictionary.
 
     Parameters:
     my_dict (Dict): List of urls.
+    rewrite: Integer.
+    number_of_urls: Integer.
 
     Returns:
     Void function
@@ -93,31 +95,36 @@ def write_to_file(my_dict):
     """
     df = pd.DataFrame.from_dict(my_dict, orient='index')
     transpose_df = df.T
-    transpose_df.to_csv(r'database.csv',index=False)      
+    transpose_df = transpose_df.head(number_of_urls)
+    if (rewrite == 1):
+        transpose_df.to_csv(r'database.csv',index=False, mode='a', header=False) 
+    else:
+        transpose_df.to_csv(r'database.csv',index=False)  
+
+        
 
 if __name__ == "__main__":
     temp = []
-    number_of_threads = int(sys.argv[3]) # The preferable number of threads.
     base_url = str(sys.argv[1]) # The base url-link, from which the program will start crawling and scrapping.
     number_of_urls = int(sys.argv[2]) # The preferable number of different urls-links.
+    rewrite = int(sys.argv[3]) # The parameter which help us decide if we will restart our database.
+    number_of_threads = int(sys.argv[4]) # The preferable number of threads.
 
     # Dictionary with lists for urls, titles, content and score.
     my_dict = {'Url':[], 'Title':[], 'Content':[], 'Score':[]}
 
     start = time.time()
-    print(len(temp))
     getLinks(base_url, temp, my_dict)
-    print(len(temp))
 
     # Checking the number of urls we have collected.
     if len(temp) < number_of_urls:
         for link in temp:
             getLinks(link, temp, my_dict)
-            print(len(temp))
             if len(temp) > number_of_urls:
+                print("Crawling Done!")
                 break
 
     end = time.time()
-    print("Total time of crawling: ", end - start, "seconds")
-    write_to_file(my_dict)
+    print("Total time of crawling: ", int(end - start), "seconds")
+    write_to_file(my_dict, rewrite, number_of_urls)
     
